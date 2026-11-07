@@ -1,0 +1,1268 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>What Is the WebCodecs API and Why Is It Useful?</title>
+<meta name="description" content="Explore the WebCodecs API, how JavaScript encodes and decodes video, and why it matters for browser-based media processing and real-time applications.">
+<meta name="keywords" content="WebCodecs API, JavaScript video encoding, VideoEncoder, VideoDecoder, browser video processing, Web APIs, real-time media">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#f5f1e8">
+
+<style>
+:root {
+  --background: #f5f1e8;
+  --paper: #fffdf8;
+  --ink: #203c3a;
+  --teal: #147d72;
+  --deep: #105b55;
+  --violet: #7760c8;
+  --orange: #e88c57;
+  --muted: #687c76;
+  --line: #e4e4d9;
+  --soft: #eaf3ee;
+  --radius: 20px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: Inter, Arial, sans-serif;
+  line-height: 1.8;
+}
+
+a {
+  color: var(--teal);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(20,125,114,.35);
+  overflow-wrap: anywhere;
+  transition: .2s ease;
+}
+
+a:hover {
+  color: var(--violet);
+  border-color: var(--violet);
+}
+
+.container {
+  width: min(1160px, 92%);
+  margin: auto;
+}
+
+/* HEADER */
+
+.header {
+  padding: 20px 0;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--ink);
+}
+
+.logo span {
+  color: var(--teal);
+}
+
+.header-label {
+  background: #e8f1eb;
+  color: var(--deep);
+  border-radius: 50px;
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+/* HERO */
+
+.hero {
+  padding: 82px 0 76px;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(119,96,200,.13), transparent 27%),
+    linear-gradient(125deg, #e9f0e9, #f5f1e8 75%);
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-inner {
+  max-width: 950px;
+}
+
+.eyebrow {
+  display: inline-block;
+  background: var(--ink);
+  color: #e5f1e8;
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+h1 {
+  font-size: clamp(38px, 6vw, 67px);
+  line-height: 1.1;
+  letter-spacing: -2.8px;
+  max-width: 930px;
+  margin-bottom: 23px;
+}
+
+h1 span {
+  color: var(--teal);
+}
+
+.hero-description {
+  max-width: 790px;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 29px;
+}
+
+.hero-tags span {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+}
+
+/* INTRODUCTION STRIP */
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 15px;
+  margin: 42px auto 65px;
+}
+
+.overview-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 23px;
+}
+
+.overview-card strong {
+  display: block;
+  font-size: 25px;
+  color: var(--teal);
+  margin-bottom: 5px;
+}
+
+.overview-card:nth-child(2) strong {
+  color: var(--violet);
+}
+
+.overview-card:nth-child(3) strong {
+  color: var(--orange);
+}
+
+.overview-card p {
+  font-size: 13px;
+  margin: 0;
+  color: var(--muted);
+}
+
+/* LAYOUT */
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 255px minmax(0,1fr);
+  gap: 43px;
+  align-items: start;
+  padding-bottom: 75px;
+}
+
+.sidebar {
+  position: sticky;
+  top: 20px;
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.sidebar h2 {
+  font-size: 16px;
+  margin-bottom: 14px;
+  letter-spacing: 0;
+}
+
+.sidebar a {
+  display: block;
+  color: var(--muted);
+  border: 0;
+  font-size: 13px;
+  padding: 7px 0;
+}
+
+.sidebar a:hover {
+  color: var(--teal);
+  padding-left: 5px;
+}
+
+article {
+  min-width: 0;
+}
+
+article section {
+  margin-bottom: 49px;
+  scroll-margin-top: 25px;
+}
+
+h2 {
+  font-size: clamp(26px,3vw,35px);
+  line-height: 1.3;
+  letter-spacing: -1px;
+  margin-bottom: 19px;
+}
+
+h3 {
+  font-size: 20px;
+  color: var(--deep);
+  margin: 27px 0 10px;
+}
+
+p {
+  color: #62736d;
+  font-size: 15.5px;
+  margin-bottom: 17px;
+}
+
+/* CALLOUT */
+
+.callout {
+  padding: 23px 25px;
+  background: #e8f2eb;
+  border-left: 5px solid var(--teal);
+  border-radius: 0 16px 16px 0;
+  margin: 25px 0;
+}
+
+.callout p {
+  color: #365b50;
+  margin: 0;
+}
+
+/* CONCEPT CARDS */
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 14px;
+  margin: 25px 0;
+}
+
+.concept {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 22px;
+}
+
+.concept-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 13px;
+  background: #e8f2eb;
+  color: var(--teal);
+  font-size: 19px;
+  font-weight: 900;
+  margin-bottom: 13px;
+}
+
+.concept:nth-child(2) .concept-icon {
+  background: #eeeafb;
+  color: var(--violet);
+}
+
+.concept h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.concept p {
+  font-size: 13px;
+  margin: 0;
+}
+
+/* DIAGRAM */
+
+.diagram {
+  background: var(--ink);
+  color: white;
+  padding: 28px;
+  border-radius: 19px;
+  margin: 27px 0;
+  overflow: hidden;
+}
+
+.diagram-title {
+  color: #c2e4d4;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  margin-bottom: 22px;
+}
+
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.flow-box {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.15);
+  padding: 17px 9px;
+  border-radius: 13px;
+  font-size: 12px;
+  color: white;
+}
+
+.flow-box strong {
+  display: block;
+  color: #b5e7d0;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.flow-arrow {
+  color: #e99b68;
+  font-size: 20px;
+}
+
+.diagram-note {
+  color: #c3d3cc;
+  font-size: 12px;
+  margin: 19px 0 0;
+}
+
+/* COMPARISON TABLE */
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  margin: 24px 0;
+  background: var(--paper);
+}
+
+table {
+  width: 100%;
+  min-width: 530px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  background: var(--deep);
+  color: white;
+  padding: 14px;
+  text-align: left;
+}
+
+td {
+  padding: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+
+tr:nth-child(even) td {
+  background: #f0f4ee;
+}
+
+/* CODE */
+
+.code-panel {
+  background: #172d2b;
+  border: 1px solid #2b514a;
+  border-radius: 16px;
+  padding: 22px;
+  margin: 23px 0;
+  overflow-x: auto;
+}
+
+.code-panel code {
+  color: #d7eee1;
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre;
+}
+
+/* NOTES */
+
+.note {
+  background: #fff0e7;
+  border: 1px solid #f5d7c4;
+  padding: 21px;
+  border-radius: 15px;
+  margin: 23px 0;
+}
+
+.note strong {
+  color: #b9663f;
+}
+
+/* STEPS */
+
+.steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+  margin: 22px 0;
+}
+
+.steps li {
+  counter-increment: step;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  padding: 17px;
+  border-radius: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.steps li:before {
+  content: counter(step,decimal-leading-zero);
+  color: var(--teal);
+  font-weight: 900;
+  font-size: 15px;
+}
+
+/* RESOURCES */
+
+.resource-box {
+  background: #eeeafb;
+  border: 1px solid #ded7f5;
+  padding: 24px;
+  border-radius: 17px;
+  margin: 25px 0;
+}
+
+.resource-box h3 {
+  color: #5844a5;
+  margin-top: 0;
+}
+
+/* FAQ */
+
+.faq-item {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+}
+
+.faq-item h3 {
+  font-size: 17px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+.faq-item p {
+  margin: 0;
+}
+
+/* CONCLUSION */
+
+.conclusion {
+  background: var(--teal);
+  border-radius: 20px;
+  padding: 31px;
+}
+
+.conclusion h2,
+.conclusion p {
+  color: white;
+}
+
+.conclusion p {
+  margin: 0;
+}
+
+/* FOOTER */
+
+.footer {
+  background: var(--ink);
+  color: #c4d4cb;
+  text-align: center;
+  padding: 29px 0;
+  font-size: 12px;
+}
+
+@media(max-width:850px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .sidebar-links {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 0 15px;
+  }
+}
+
+@media(max-width:600px) {
+  .hero {
+    padding: 58px 0 48px;
+  }
+
+  h1 {
+    letter-spacing: -1.6px;
+  }
+
+  .overview,
+  .concept-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flow {
+    flex-direction: column;
+  }
+
+  .flow-box {
+    width: 100%;
+  }
+
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+
+  .sidebar-links {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram {
+    padding: 20px;
+  }
+
+  .conclusion {
+    padding: 23px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="container header-inner">
+    <div class="logo">WEB<span>LAB</span></div>
+    <div class="header-label">Browser Technology</div>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="container hero-inner">
+    <span class="eyebrow">JavaScript & Media APIs</span>
+
+    <h1>What Is the <span>WebCodecs API</span> and Why Is It Useful?</h1>
+
+    <p class="hero-description">
+      Modern browsers can do much more than display web pages. They can capture, process, encode, and decode digital media using specialized browser interfaces. WebCodecs gives developers more direct control over audio and video processing, opening up possibilities for advanced web applications.
+    </p>
+
+    <div class="hero-tags">
+      <span>JavaScript</span>
+      <span>Video Encoding</span>
+      <span>Media Decoding</span>
+      <span>Web APIs</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <section class="overview">
+    <div class="overview-card">
+      <strong>Encode</strong>
+      <p>Convert raw media frames into compressed data suitable for storage or transmission.</p>
+    </div>
+
+    <div class="overview-card">
+      <strong>Decode</strong>
+      <p>Reconstruct usable audio and video data from compressed media streams.</p>
+    </div>
+
+    <div class="overview-card">
+      <strong>Control</strong>
+      <p>Work directly with media processing stages through JavaScript interfaces.</p>
+    </div>
+  </section>
+</div>
+
+<div class="container main-layout">
+
+<aside class="sidebar">
+  <h2>Explore This Guide</h2>
+  <nav class="sidebar-links">
+    <a href="#introduction">Introduction</a>
+    <a href="#what-is-webcodecs">What Is WebCodecs?</a>
+    <a href="#why-developed">Why Was It Developed?</a>
+    <a href="#components">Main Components</a>
+    <a href="#workflow">How It Works</a>
+    <a href="#encoding">Video Encoding</a>
+    <a href="#decoding">Video Decoding</a>
+    <a href="#code-example">JavaScript Example</a>
+    <a href="#applications">Practical Applications</a>
+    <a href="#webrtc">WebCodecs and WebRTC</a>
+    <a href="#limitations">Limitations</a>
+    <a href="#compatibility">Browser Compatibility</a>
+    <a href="#faq">FAQs</a>
+  </nav>
+</aside>
+
+<article>
+
+<section id="introduction">
+  <h2>Introduction: A New Level of Media Control in Browsers</h2>
+
+  <p>
+    Video processing has become an important part of modern web development. Applications now support live streaming, browser-based editing, video conferencing, screen recording, interactive media, and many other experiences. These features require more than simply loading a video file and placing it inside an HTML element.
+  </p>
+
+  <p>
+    Developers often need to manipulate individual frames, control encoding settings, inspect timestamps, or work with compressed media data. Traditional browser elements and media APIs handle many common playback and capture tasks, but they do not always provide the low-level processing control required by advanced applications.
+  </p>
+
+  <p>
+    This is where the WebCodecs API becomes useful. It provides JavaScript interfaces for working with audio and video encoders and decoders. Instead of treating media as a complete file or stream, developers can work with individual frames and encoded chunks.
+  </p>
+
+  <div class="callout">
+    <p>
+      WebCodecs is designed for developers who need greater control over media processing. It does not replace every existing browser media API; it provides additional building blocks for applications that need more direct access to encoding and decoding operations.
+    </p>
+  </div>
+</section>
+
+<section id="what-is-webcodecs">
+  <h2>What Is the WebCodecs API?</h2>
+
+  <p>
+    WebCodecs is a browser API that exposes audio and video codec functionality to JavaScript. It allows applications to encode raw media into compressed formats and decode compressed media into usable audio or video data.
+  </p>
+
+  <p>
+    A codec is software or hardware functionality responsible for encoding and decoding digital media. Video codecs reduce the amount of information required to represent moving images, while audio codecs perform a similar task for sound.
+  </p>
+
+  <p>
+    The API gives developers access to interfaces such as VideoEncoder, VideoDecoder, AudioEncoder, AudioDecoder, VideoFrame, and EncodedVideoChunk. Each interface has a specific role in the media processing pipeline.
+  </p>
+
+  <p>
+    One important advantage is that developers can work with media data without having to build an entire codec implementation from scratch. The browser provides the processing interface and uses available system capabilities where supported.
+  </p>
+
+  <p>
+    Depending on the device and browser, encoding and decoding may use dedicated hardware acceleration or software implementations. Developers should not assume that every codec or configuration will automatically use the GPU.
+  </p>
+</section>
+
+<section id="why-developed">
+  <h2>Why Was WebCodecs Developed?</h2>
+
+  <p>
+    Before WebCodecs, web developers already had access to several media technologies. The HTML video element made playback straightforward, MediaRecorder supported recording, and WebRTC enabled real-time communication.
+  </p>
+
+  <p>
+    However, these interfaces do not expose every stage of the underlying media processing pipeline. Applications that needed to manipulate encoded frames or build custom media workflows often had to rely on additional tools, complex workarounds, or server-side processing.
+  </p>
+
+  <p>
+    WebCodecs addresses this need by providing more direct access to codec operations. It allows developers to combine media processing with other web technologies according to the needs of their applications.
+  </p>
+
+  <h3>Greater Control Over Individual Frames</h3>
+
+  <p>
+    Applications can create, process, and encode video frames individually. This is useful when building tools that need custom image transformations, frame analysis, or specialized recording workflows.
+  </p>
+
+  <h3>More Flexible Processing Pipelines</h3>
+
+  <p>
+    Developers can decide how media is captured, transformed, encoded, transmitted, decoded, and displayed. This flexibility is valuable for applications that require more control than a standard video playback element provides.
+  </p>
+
+  <h3>Access to Browser Codec Implementations</h3>
+
+  <p>
+    WebCodecs allows JavaScript applications to use codec capabilities exposed by the browser. The available formats depend on the operating system, hardware, browser implementation, and codec configuration.
+  </p>
+</section>
+
+<section id="components">
+  <h2>Main Components of the WebCodecs API</h2>
+
+  <p>
+    Understanding the main interfaces makes it easier to see how WebCodecs fits into a larger application. Each component handles a particular type of media data or processing operation.
+  </p>
+
+  <div class="concept-grid">
+    <div class="concept">
+      <div class="concept-icon">VE</div>
+      <h3>VideoEncoder</h3>
+      <p>
+        Converts VideoFrame objects into compressed video chunks according to a supported codec configuration.
+      </p>
+    </div>
+
+    <div class="concept">
+      <div class="concept-icon">VD</div>
+      <h3>VideoDecoder</h3>
+      <p>
+        Takes encoded video chunks and reconstructs frames that an application can process or display.
+      </p>
+    </div>
+
+    <div class="concept">
+      <div class="concept-icon">VF</div>
+      <h3>VideoFrame</h3>
+      <p>
+        Represents a video frame and provides access to its visual data, timing information, and related properties.
+      </p>
+    </div>
+
+    <div class="concept">
+      <div class="concept-icon">VC</div>
+      <h3>EncodedVideoChunk</h3>
+      <p>
+        Represents encoded video data along with information such as timestamps and whether a chunk is a key frame.
+      </p>
+    </div>
+  </div>
+
+  <h3>Audio Processing Interfaces</h3>
+
+  <p>
+    WebCodecs also provides AudioEncoder, AudioDecoder, AudioData, and EncodedAudioChunk. These interfaces support similar processing workflows for sound.
+  </p>
+
+  <p>
+    For example, an application might capture audio, process it into AudioData objects, encode it into compressed chunks, and later decode those chunks for playback or analysis.
+  </p>
+</section>
+
+<section id="workflow">
+  <h2>How Does WebCodecs Work?</h2>
+
+  <p>
+    A typical WebCodecs workflow begins with raw media or compressed media data. The application configures an encoder or decoder, supplies the appropriate input, and receives output through callbacks.
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">Simplified Video Encoding Workflow</div>
+    <div class="flow">
+      <div class="flow-box">
+        <strong>Source</strong>
+        Raw video frame
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">
+        <strong>Encoder</strong>
+        Codec processing
+      </div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-box">
+        <strong>Output</strong>
+        Encoded chunks
+      </div>
+    </div>
+    <p class="diagram-note">
+      The application can then store, transmit, or further process the encoded output.
+    </p>
+  </div>
+
+  <h3>Step 1: Prepare the Input</h3>
+
+  <p>
+    An application needs a source of media. It might come from a camera stream, a video element, a canvas, or another supported source. The frames must be represented in a format that the encoder can accept.
+  </p>
+
+  <h3>Step 2: Configure the Encoder</h3>
+
+  <p>
+    The application selects a supported codec and provides configuration settings. Depending on the codec, these may include dimensions, bitrate, frame rate, and other encoding parameters.
+  </p>
+
+  <h3>Step 3: Submit Frames</h3>
+
+  <p>
+    VideoFrame objects are passed to the encoder using its encode() method. The browser processes the frames and produces encoded output when available.
+  </p>
+
+  <h3>Step 4: Handle Encoded Data</h3>
+
+  <p>
+    The output callback receives EncodedVideoChunk objects and associated metadata. The application can decide whether to store the data, send it through a network connection, or use it in another processing stage.
+  </p>
+
+  <h3>Step 5: Close Resources</h3>
+
+  <p>
+    VideoFrame objects and codec instances can hold significant resources. Applications should close frames when they are no longer needed and close encoder or decoder instances when processing is finished.
+  </p>
+</section>
+
+<section id="encoding">
+  <h2>Understanding Video Encoding with WebCodecs</h2>
+
+  <p>
+    Video encoding is the process of converting raw frames into compressed data. Raw video can require substantial storage and network capacity, so compression is essential for practical streaming, recording, and communication.
+  </p>
+
+  <p>
+    The VideoEncoder interface provides a way to encode VideoFrame objects into compressed chunks. Developers can configure the encoder, submit frames, and handle output through a callback.
+  </p>
+
+  <h3>Why Encoding Settings Matter</h3>
+
+  <p>
+    Resolution determines the dimensions of the video frame, while bitrate controls how much data is allocated to the encoded stream. Frame rate affects how many frames are processed each second.
+  </p>
+
+  <p>
+    A higher resolution or frame rate generally requires more processing and may need more bandwidth. A lower bitrate can reduce file size or transmission requirements, but it may also introduce visible compression artifacts.
+  </p>
+
+  <p>
+    Key frames are also important. They provide reference points from which a decoder can reconstruct subsequent frames. The application can request key frames when appropriate, such as at the beginning of a new segment.
+  </p>
+</section>
+
+<section id="decoding">
+  <h2>Understanding Video Decoding with WebCodecs</h2>
+
+  <p>
+    Decoding is the reverse process of encoding. The browser receives compressed video data and reconstructs frames that can be displayed or processed further.
+  </p>
+
+  <p>
+    The VideoDecoder interface accepts EncodedVideoChunk objects and produces VideoFrame objects through its output callback. These frames can then be sent to a rendering pipeline or another application component.
+  </p>
+
+  <h3>Why Timestamps Are Important</h3>
+
+  <p>
+    Each encoded chunk contains timing information. Timestamps help applications maintain the intended playback sequence and synchronize video with audio.
+  </p>
+
+  <p>
+    A decoder also needs suitable reference information. For example, some compressed frames depend on earlier frames, so decoding cannot always begin from an arbitrary point in the stream.
+  </p>
+
+  <div class="note">
+    <strong>Important distinction:</strong>
+    WebCodecs handles codec operations, not a complete media player. Developers are responsible for managing timing, buffering, rendering, synchronization, and other parts of the application.
+  </div>
+</section>
+
+<section id="code-example">
+  <h2>A Basic JavaScript WebCodecs Example</h2>
+
+  <p>
+    The following example demonstrates the general structure of a video encoder. It assumes that a valid VideoFrame object has already been created and that the selected codec configuration is supported by the browser.
+  </p>
+
+  <div class="code-panel">
+<code>async function encodeVideoFrame(frame) {
+  const config = {
+    codec: "vp8",
+    width: frame.displayWidth,
+    height: frame.displayHeight,
+    bitrate: 1_000_000,
+    framerate: 30
+  };
+
+  const supported =
+    await VideoEncoder.isConfigSupported(config);
+
+  if (!supported.supported) {
+    throw new Error("Unsupported encoder configuration");
+  }
+
+  const encoder = new VideoEncoder({
+    output(chunk, metadata) {
+      console.log("Encoded chunk:", chunk);
+      console.log("Metadata:", metadata);
+    },
+
+    error(error) {
+      console.error("Encoding error:", error);
+    }
+  });
+
+  encoder.configure(config);
+
+  encoder.encode(frame, {
+    keyFrame: true
+  });
+
+  await encoder.flush();
+  encoder.close();
+}</code>
+  </div>
+
+  <p>
+    This example checks whether the requested configuration is supported, creates an encoder, submits a frame, and waits for pending encoding work to finish. The output callback receives encoded chunks as the browser produces them.
+  </p>
+
+  <p>
+    In a production application, developers should reuse encoder instances rather than repeatedly creating them for individual frames. They should also manage input frames, handle backpressure, process output metadata, and close resources carefully.
+  </p>
+
+  <h3>What Is Backpressure?</h3>
+
+  <p>
+    Backpressure occurs when an application supplies media faster than the encoder or decoder can process it. If too many frames accumulate, memory usage can grow and the application may become less responsive.
+  </p>
+
+  <p>
+    WebCodecs provides queue-related properties such as encodeQueueSize and decodeQueueSize. Applications can monitor these values and adjust how quickly they submit new work.
+  </p>
+</section>
+
+<section id="applications">
+  <h2>Where Is the WebCodecs API Useful?</h2>
+
+  <p>
+    WebCodecs is especially useful when a web application needs direct control over audio or video data rather than relying entirely on built-in playback or recording behaviour.
+  </p>
+
+  <h3>1. Browser-Based Video Editors</h3>
+
+  <p>
+    A web editor may need to extract frames, apply visual transformations, encode clips, or prepare media for export. WebCodecs can provide the codec processing capabilities required for such workflows.
+  </p>
+
+  <h3>2. Live Streaming Applications</h3>
+
+  <p>
+    Streaming tools can use encoding interfaces to compress captured video before sending it to a server or another destination. The application must still handle networking, buffering, and delivery.
+  </p>
+
+  <h3>3. Media Conversion Tools</h3>
+
+  <p>
+    Web applications can decode supported media, transform frames, and encode the result into another supported format. This can help create browser-based conversion workflows without automatically sending every frame to a remote server.
+  </p>
+
+  <h3>4. Video Analysis</h3>
+
+  <p>
+    Developers can access individual frames for tasks such as image recognition, object tracking, visual inspection, and other processing operations. Additional APIs or machine-learning tools may be needed for the analysis itself.
+  </p>
+
+  <h3>5. Real-Time Communication</h3>
+
+  <p>
+    Custom communication applications may use WebCodecs for specialized media processing workflows. This can be useful when developers need greater control over encoding and decoding than a higher-level interface provides.
+  </p>
+</section>
+
+<section id="webrtc">
+  <h2>WebCodecs vs WebRTC: What Is the Difference?</h2>
+
+  <p>
+    WebCodecs and WebRTC are related technologies, but they solve different problems. WebCodecs provides codec-level media processing, while WebRTC supplies a broader collection of capabilities for real-time communication.
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>WebCodecs</th>
+          <th>WebRTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Main purpose</td>
+          <td>Audio and video codec processing</td>
+          <td>Real-time media communication</td>
+        </tr>
+        <tr>
+          <td>Encoding</td>
+          <td>Direct encoder interfaces</td>
+          <td>Integrated media transmission pipeline</td>
+        </tr>
+        <tr>
+          <td>Decoding</td>
+          <td>Direct decoder interfaces</td>
+          <td>Built into media reception</td>
+        </tr>
+        <tr>
+          <td>Networking</td>
+          <td>Not provided by itself</td>
+          <td>Supports real-time peer connections</td>
+        </tr>
+        <tr>
+          <td>Developer control</td>
+          <td>More direct codec control</td>
+          <td>Higher-level communication workflow</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    For example, a developer could use WebRTC to establish a communication session and WebCodecs for a separate custom encoding or decoding task. However, combining them requires careful handling of encoded data, timing, codec configuration, and transport.
+  </p>
+
+  <p>
+    Network conditions remain important in either approach. Delays, packet loss, and inconsistent packet arrival times can affect the experience even when media processing is efficient. This is discussed in more detail in this <a href="https://marios-46.github.io/latency-jitter-guide/" target="_blank" rel="noopener noreferrer">latency, jitter, and packet loss guide</a>.
+  </p>
+</section>
+
+<section id="performance">
+  <h2>How WebCodecs Relates to Hardware Acceleration</h2>
+
+  <p>
+    One reason WebCodecs is useful is that browser implementations can use available hardware acceleration for supported codec operations. This can reduce the amount of processing performed by the CPU and improve efficiency for demanding media workloads.
+  </p>
+
+  <p>
+    The actual result depends on the browser, device, codec, and configuration. Developers can use support checks and configuration options to understand what a browser reports as available, but the API does not guarantee that every operation will run on dedicated hardware.
+  </p>
+
+  <p>
+    Applications that work with high-resolution frames or continuous video streams should also consider memory usage, frame transfer costs, processing queues, and resource cleanup. These details can influence performance just as much as the encoder itself.
+  </p>
+
+  <div class="resource-box">
+    <h3>Explore GPU Video Processing</h3>
+    <p>
+      Graphics hardware plays an important role in modern media pipelines. For a closer look at GPU-based encoding, decoding, and visual workloads, explore this <a href="https://gpu-video-processing.vercel.app/" target="_blank" rel="noopener noreferrer">GPU video processing and hardware acceleration resource</a>.
+    </p>
+  </div>
+</section>
+
+<section id="limitations">
+  <h2>Limitations and Challenges of WebCodecs</h2>
+
+  <p>
+    WebCodecs offers powerful features, but it also introduces responsibilities that developers must understand before using it in production.
+  </p>
+
+  <h3>Browser and Codec Support</h3>
+
+  <p>
+    Not every browser supports the same codecs or configurations. An encoder that works on one computer may not be available on another. Applications should check support rather than assuming a particular configuration will always work.
+  </p>
+
+  <h3>Resource Management</h3>
+
+  <p>
+    VideoFrame objects and codec instances can consume significant system resources. Applications need to close frames when finished and manage encoder and decoder lifecycles carefully.
+  </p>
+
+  <h3>Processing Complexity</h3>
+
+  <p>
+    WebCodecs exposes lower-level operations, which means developers must take responsibility for frame ordering, timestamps, synchronization, buffering, and error handling.
+  </p>
+
+  <h3>Security Requirements</h3>
+
+  <p>
+    WebCodecs is generally available only in secure contexts, such as HTTPS pages and localhost development environments. Some capabilities and codec configurations may have additional restrictions.
+  </p>
+
+  <h3>Not a Replacement for Every Media API</h3>
+
+  <p>
+    If an application only needs basic video playback, the HTML video element may be sufficient. MediaRecorder is suitable for many recording tasks, while WebRTC provides higher-level communication capabilities. WebCodecs is most valuable when direct codec control is actually required.
+  </p>
+</section>
+
+<section id="compatibility">
+  <h2>Browser Compatibility and Getting Started</h2>
+
+  <p>
+    WebCodecs support depends on the browser and the platform on which it runs. Even when the API is available, the exact codecs and configurations may differ.
+  </p>
+
+  <p>
+    Before using it, developers should check for the relevant interfaces, test the requested codec configuration, and provide a fallback for unsupported environments.
+  </p>
+
+  <div class="code-panel">
+<code>if ("VideoEncoder" in window) {
+  console.log("VideoEncoder API is available");
+} else {
+  console.log("Use an alternative processing method");
+}</code>
+  </div>
+
+  <p>
+    This simple check only confirms that the interface exists. It does not guarantee that a particular codec, resolution, or encoder configuration will work. Use VideoEncoder.isConfigSupported() or VideoDecoder.isConfigSupported() to check the requested configuration.
+  </p>
+
+  <p>
+    Developers should also test on real target devices, because performance and available hardware acceleration can vary significantly between systems.
+  </p>
+
+  <div class="note">
+    <strong>Development tip:</strong>
+    Start with a small test stream, confirm codec support, monitor processing queues, and verify that every VideoFrame and codec instance is properly released.
+  </div>
+</section>
+
+<section id="related">
+  <h2>Related Concepts in Browser-Based Communication</h2>
+
+  <p>
+    Understanding WebCodecs becomes easier when it is considered alongside other browser technologies. Camera capture, microphone processing, video encoding, and network transmission are separate stages that work together in a complete media application.
+  </p>
+
+  <p>
+    For example, browser communication tools may need to manage microphone input, audio levels, and sound clarity before transmitting voice. This <a href="http://microphone-sound-quality-guide.lovestoblog.com/?i=1" target="_blank" rel="noopener noreferrer">microphone sound quality and audio clarity guide</a> explores some of the factors that influence digital audio.
+  </p>
+
+  <p>
+    When developing an interactive browser experience, it is also important to consider how users access media features and how the interface responds during a session. A browser-based communication experience such as <a href="https://omegletv.io/" target="_blank" rel="noopener noreferrer">Omegle</a> provides a useful context for thinking about the relationship between media processing and real-time interaction.
+  </p>
+</section>
+
+<section id="faq">
+  <h2>Frequently Asked Questions</h2>
+
+  <div class="faq-item">
+    <h3>1. What is the main purpose of the WebCodecs API?</h3>
+    <p>
+      Its main purpose is to provide JavaScript interfaces for encoding and decoding audio and video. It gives developers more direct control over codec processing inside compatible browsers.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>2. Is WebCodecs part of JavaScript?</h3>
+    <p>
+      WebCodecs is a browser web API that developers access through JavaScript. It provides interfaces that applications can use to work with media encoders, decoders, frames, and encoded chunks.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>3. Does WebCodecs support hardware acceleration?</h3>
+    <p>
+      Browser implementations can use hardware acceleration for supported codec configurations when suitable hardware is available. However, developers should not assume every encoding or decoding operation uses dedicated hardware.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>4. What is the difference between VideoEncoder and VideoDecoder?</h3>
+    <p>
+      VideoEncoder converts raw video frames into compressed chunks. VideoDecoder accepts encoded chunks and reconstructs video frames for further processing or display.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>5. Can WebCodecs be used for video editing?</h3>
+    <p>
+      Yes. It can support custom browser-based editing workflows that need frame-level access, encoding, and decoding. Developers must also implement editing controls, rendering, audio handling, and file management.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>6. Does WebCodecs replace WebRTC?</h3>
+    <p>
+      No. WebCodecs focuses on codec operations, whereas WebRTC provides broader real-time communication functionality. They can be used together in applications with specialized media requirements.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>7. Is WebCodecs available in every browser?</h3>
+    <p>
+      Availability varies by browser and platform. Developers should check for the required API interfaces and test individual codec configurations before relying on them.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>8. Does WebCodecs require HTTPS?</h3>
+    <p>
+      WebCodecs is generally restricted to secure contexts. HTTPS is the normal choice for deployed applications, while localhost is commonly accepted for local development.
+    </p>
+  </div>
+
+  <div class="faq-item">
+    <h3>9. What is the purpose of VideoFrame?</h3>
+    <p>
+      VideoFrame represents a video frame that can be passed into an encoder or used by other media-processing components. It also carries useful information such as dimensions and timestamps.
+    </p>
+  </div>
+
+</section>
+
+<section class="conclusion">
+  <h2>Final Thoughts</h2>
+
+  <p>
+    The WebCodecs API gives web developers more control over how audio and video are processed inside modern browsers. Its encoder, decoder, frame, and chunk interfaces make it possible to build advanced media workflows for video editing, streaming, analysis, and interactive applications. It does not replace higher-level tools such as WebRTC or MediaRecorder, but it complements them when an application needs direct access to codec operations. By understanding its capabilities, browser support, resource requirements, and limitations, developers can make better decisions when building modern web-based media experiences.
+  </p>
+</section>
+
+</article>
+</div>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    WebLab · Exploring JavaScript, browser APIs, digital media, and web technologies.
+  </div>
+</footer>
+
+</body>
+</html>
